@@ -20,8 +20,25 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import org.example.project.shared.models.Todo
 import org.example.project.shared.viewmodel.TodoViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+
+// Instant型を整形して表示するためのヘルパー関数
+fun formatInstant(instant: Instant): String {
+    // kotlinx.datetimeのInstantをJava時間に変換
+    val epochSeconds = instant.epochSeconds
+    val date = Date(epochSeconds * 1000) // ミリ秒に変換
+    
+    // 日付フォーマット
+    val formatter = SimpleDateFormat("yyyy/MM/dd HH:mm", Locale.getDefault())
+    return formatter.format(date)
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,6 +169,14 @@ fun TodoItem(
                         color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
                     )
                 }
+                
+                // 作成日時を表示
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "作成日時: ${formatInstant(todo.createdAt)}",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                )
             }
             
             Spacer(modifier = Modifier.width(8.dp))

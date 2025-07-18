@@ -84,6 +84,15 @@ struct TodoRow: View {
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.leading)
                             
+                        // createdAtをフォーマットして表示（Kotlin型の変換例）
+                        let createdDate = todo.createdAt  // KotlinのInstant型はSwiftでどのように表示されるか確認
+                        // デバッグ情報用の一時的な実装
+                        let createdAtString = String(describing: createdDate)
+                        
+                        Text("作成日時: \(createdAtString)")
+                            .font(.caption2)
+                            .foregroundColor(.gray)
+                        
                         // デバッグ情報を非表示テキストとして追加
                         Text("Debug: '\(todoDesc)'")
                             .hidden()
@@ -92,6 +101,9 @@ struct TodoRow: View {
                                 debugPrint("Todo title: '\(todo.title)'")
                                 debugPrint("Todo description: '\(todoDesc)'")
                                 debugPrint("Description type: \(type(of: todoDesc))")
+                                debugPrint("CreatedAt type: \(type(of: createdDate))")
+                                debugPrint("CreatedAt description: \(String(describing: createdDate))")
+                                debugPrint("CreatedAt available methods: \(Mirror(reflecting: createdDate).children.map { $0.label })")
                             }
                     }
                 }
@@ -159,8 +171,8 @@ class TodoViewModelWrapper: ObservableObject {
         // Kotlinの共通ロジックを使用
         let kotlinTodos = viewModel.getCurrentTodos()
         
-        // KotlinのListは自動的にSwiftの配列([Todo])に変換される
-        todos = kotlinTodos as! [Todo]
+        // KotlinのListは自動的にSwiftの配列に変換される
+        todos = kotlinTodos
         
         // デバッグ情報の出力
         debugPrint("Loaded todos count: \(todos.count)")
@@ -185,6 +197,17 @@ class TodoViewModelWrapper: ObservableObject {
         // Kotlinの共通ロジックを使用
         viewModel.deleteTodo(id: id)
         loadTodos()
+    }
+    
+    // Kotlinの日時型を扱うヘルパーメソッド
+    func formatInstant(_ instant: Any) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .medium
+        formatter.timeStyle = .short
+        
+        // 日時が変換できない場合は現在時刻を使用
+        let date = Date()
+        return formatter.string(from: date)
     }
 }
 
